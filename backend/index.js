@@ -1,4 +1,8 @@
-const fastify = require("fastify")({ logger: true });
+import Fastify from 'fastify'
+
+const fastify = Fastify({
+  logger: true
+})
 
 fastify.get("/api", async (request, reply) => {
     return { hello: "world" };

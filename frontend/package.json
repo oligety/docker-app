@@ -1,6 +1,6 @@
 {
-  "name": "docker-app-web",
-  "description": "Docker app - web",
+  "name": "docker-app-frontend",
+  "description": "Docker app - frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",

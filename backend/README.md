@@ -1,3 +1,3 @@
-# Docker app - api
+# Docker app - backend
 
 API using fastify

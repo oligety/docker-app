@@ -49,6 +49,7 @@ services:
       traefik.http.services.backend.loadbalancer.server.port: 3001
     volumes:
       - ./backend:/app
+      - /app/node_modules
     networks:
       - network-backend
   database:
