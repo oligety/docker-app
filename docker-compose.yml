@@ -1,4 +1,19 @@
 services:
+  web:
+    image: frontend
+    build:
+      context: frontend
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src
+    networks: 
+     - network-backend
   api:
     image: backend
     build:
@@ -8,3 +23,10 @@ services:
       NODE_ENV: production
     ports:
       - 3001:3001
+    volumes:
+      - ./backend:/app
+    networks: 
+     - network-backend
+
+networks:
+  network-backend:
