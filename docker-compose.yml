@@ -1,34 +1,59 @@
 services:
-  web:
+  proxy:
+    image: traefik:v3
+    command:
+      - --api.dashboard=true
+      - --providers.docker
+      - --log.level=INFO
+      - --accesslog=true
+      - --entrypoints.web.address=:80
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mydashboard.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.mydashboard.service=api@internal
+      - traefik.http.routers.mydashboard.middlewares=myauth
+      - traefik.http.middlewares.myauth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+    networks:
+      - network-backend
+  frontend:
     image: frontend
     build:
       context: frontend
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
+    labels:
+      traefik.http.routers.frontend.rule: "Host(`localhost`)"
+      traefik.http.services.frontend.loadbalancer.server.port: 3000
     depends_on:
-      - api
+      - backend
     volumes:
       - ./frontend/src:/app/src
-    ports:
-      - 3000:3000
     networks:
       - network-backend
-  api:
+  backend:
     image: backend
     build:
       context: backend
       dockerfile: ./Dockerfile
+    depends_on:
+      - database
     environment:
       NODE_ENV: production
+    labels:
+      traefik.http.routers.backend.rule: "Host(`localhost`) && PathPrefix(`/api`)"
+      traefik.http.services.backend.loadbalancer.server.port: 3001
     volumes:
       - ./backend:/app
-    ports:
-      - 3001:3001
     networks:
       - network-backend
-  db:
+  database:
     image: mariadb:latest
+    container_name: database
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
     volumes:
